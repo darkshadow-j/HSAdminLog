@@ -20,10 +20,38 @@ public class LogsModel {
     String ip;
     @Transient
     String username;
+    @Transient
+    LogsModel logsModel;
+    @Transient
+    String telephone;
 
     public String getIp() {
         this.setIp();
         return ip;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public LogsModel getLogsModel() {
+        return logsModel;
+    }
+
+    public void setLogsModel(LogsModel logsModel) {
+        this.logsModel = logsModel;
     }
 
     public void setIp() {
@@ -34,9 +62,19 @@ public class LogsModel {
         this.ip = r;
     }
 
+    public void setUsername() {
+        String name = this.message;
+        if (name.contains("logged in")) {
+            name = name.substring(0, name.lastIndexOf("(")-1).trim();
+            this.username = name;
+        }
+    }
+
     public String getUsername() {
+        this.setUsername();
         return username;
     }
+
 
     public LogsModel() {
     }
@@ -79,6 +117,21 @@ public class LogsModel {
 
     public void setProgram(String program) {
         this.program = program;
+    }
+
+    @Override
+    public String toString() {
+        return "LogsModel{" +
+                "id=" + id +
+                ", date='" + date + '\'' +
+                ", time='" + time + '\'' +
+                ", message='" + message + '\'' +
+                ", program='" + program + '\'' +
+                ", ip='" + ip + '\'' +
+                ", username='" + username + '\'' +
+                ", logsModel=" + logsModel +
+                ", telephone='" + telephone + '\'' +
+                '}';
     }
 }
 

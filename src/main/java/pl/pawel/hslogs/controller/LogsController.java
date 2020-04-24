@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.pawel.hslogs.httpclient;
 import pl.pawel.hslogs.jpa.LogsDAO;
 import pl.pawel.hslogs.model.LogsModel;
 
@@ -24,6 +25,8 @@ public class LogsController {
 
     @Autowired
     private LogsDAO logsDAO;
+    @Autowired
+    private pl.pawel.hslogs.httpclient httpclient;
 
 
     @GetMapping
@@ -32,8 +35,11 @@ public class LogsController {
         logsModels.forEach(p -> {
             LogsModel ls = logsDAO.getFirstByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(p.getDate(), p.getTime(), p.getIp(), "logged in");
             if (ls != null) {
-                System.out.println(ls.getMessage() + " *** ");
+                ls.setLogsModel(p);
+                ls.setTelephone(httpclient.getTelNumberByName(ls.getUsername()));
+                System.out.println(ls);
             }
+
         });
 
         return logsDAO.getLogsModelByDateAndTimeBetweenAndProgram("2020-04-23", "08:00:00", "18:00:00", "firewall,info");
