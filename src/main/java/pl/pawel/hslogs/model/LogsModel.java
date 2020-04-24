@@ -1,6 +1,8 @@
 package pl.pawel.hslogs.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.xml.crypto.Data;
 import java.sql.Time;
@@ -9,6 +11,7 @@ import java.util.Date;
 @Entity(name = "log")
 public class LogsModel {
 
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,10 +28,14 @@ public class LogsModel {
     @Transient
     String telephone;
 
-    public String getIp() {
+    public String getIp(boolean get) {
         this.setIp();
         return ip;
     }
+    public String getIp() {
+        return ip;
+    }
+
 
     public String getTelephone() {
         return telephone;
@@ -55,12 +62,15 @@ public class LogsModel {
     }
 
     public void setIp() {
-        String r = this.message;
-        r = r.substring(0, r.lastIndexOf(">"));
-        r = r.substring(0, r.lastIndexOf(":"));
-        r = r.substring(r.lastIndexOf(",") + 1).trim();
-        this.ip = r;
+        if(this.message!=null) {
+            String r = this.message;
+            r = r.substring(0, r.lastIndexOf(">"));
+            r = r.substring(0, r.lastIndexOf(":"));
+            r = r.substring(r.lastIndexOf(",") + 1).trim();
+            this.ip = r;
+        }
     }
+
 
     public void setUsername() {
         String name = this.message;

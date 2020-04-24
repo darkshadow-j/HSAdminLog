@@ -12,11 +12,14 @@ import java.util.Date;
 @Repository
 public interface LogsDAO extends JpaRepository<LogsModel, Long> {
 
-    List<LogsModel> getLogsModelByDateAndTimeBetweenAndProgram(String date, String start, String stop, String program);
+    List<LogsModel> getLogsModelByDateAndTimeBetweenAndProgramAndMessageIsContaining(String date, String start, String stop, String program, String ip);
 
     List<LogsModel> getLogsModelByMessageIsContainingAndMessageIsContaining(String cont, String ip);
 
     LogsModel getFirstByDateAndTimeBeforeAndMessageIsContainingAndProgram(String date, String time, String ip, String program);
-
+    LogsModel getDistinctFirstByDateAndTimeBeforeAndMessageIsContainingAndProgram(String date, String time, String ip, String program);
     LogsModel getFirstByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(String date, String time, String ip, String program);
+    List<LogsModel> getByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(String date, String time, String ip, String program);
+    LogsModel findTopByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(String date, String time, String ip, String program);
+    List<LogsModel> findLogsModelByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(String date, String time, String ip, String program);
 }

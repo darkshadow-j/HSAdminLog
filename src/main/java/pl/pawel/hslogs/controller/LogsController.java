@@ -2,14 +2,15 @@ package pl.pawel.hslogs.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.pawel.hslogs.httpclient;
 import pl.pawel.hslogs.jpa.LogsDAO;
 import pl.pawel.hslogs.model.LogsModel;
+import pl.pawel.hslogs.model.SearchModel;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/logs")
 public class LogsController {
@@ -28,21 +30,28 @@ public class LogsController {
     @Autowired
     private pl.pawel.hslogs.httpclient httpclient;
 
+    @PostMapping("/search")
+    public ResponseEntity<List<LogsModel>> searchLogs(@RequestBody SearchModel searchModel) throws ParseException {
+        System.out.println(searchModel);
+        return new ResponseEntity<>(this.getAllLogs(searchModel), HttpStatus.OK);
+    }
 
-    @GetMapping
-    public List<LogsModel> getAllLogs() throws ParseException {
-        List<LogsModel> logsModels = logsDAO.getLogsModelByDateAndTimeBetweenAndProgram("2020-04-23", "08:00:00", "18:00:00", "firewall,info");
+
+    public List<LogsModel> getAllLogs(SearchModel searchModel) throws ParseException {
+        List<LogsModel> logsModels = logsDAO.getLogsModelByDateAndTimeBetweenAndProgramAndMessageIsContaining(searchModel.getDate(), searchModel.getTimeStart(), searchModel.getTimeStop(), "firewall,info", searchModel.getIpAddress());
+        List<LogsModel> resultlog = new ArrayList<>();
         logsModels.forEach(p -> {
-            LogsModel ls = logsDAO.getFirstByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(p.getDate(), p.getTime(), p.getIp(), "logged in");
+            LogsModel ls = logsDAO.getFirstByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(p.getDate(), p.getTime(), p.getIp(true), "logged in");
             if (ls != null) {
                 ls.setLogsModel(p);
                 ls.setTelephone(httpclient.getTelNumberByName(ls.getUsername()));
                 System.out.println(ls);
+                resultlog.add(ls);
             }
-
         });
+        System.out.println(resultlog);
 
-        return logsDAO.getLogsModelByDateAndTimeBetweenAndProgram("2020-04-23", "08:00:00", "18:00:00", "firewall,info");
+        return resultlog;
     }
 
     @GetMapping("/log")
