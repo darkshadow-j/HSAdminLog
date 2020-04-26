@@ -30,6 +30,8 @@ public class LogsController {
     @Autowired
     private pl.pawel.hslogs.httpclient httpclient;
 
+
+
     @PostMapping("/search")
     public ResponseEntity<List<LogsModel>> searchLogs(@RequestBody SearchModel searchModel) throws ParseException {
         System.out.println(searchModel);
@@ -40,8 +42,13 @@ public class LogsController {
     public List<LogsModel> getAllLogs(SearchModel searchModel) throws ParseException {
         List<LogsModel> logsModels = logsDAO.getLogsModelByDateAndTimeBetweenAndProgramAndMessageIsContaining(searchModel.getDate(), searchModel.getTimeStart(), searchModel.getTimeStop(), "firewall,info", searchModel.getIpAddress());
         List<LogsModel> resultlog = new ArrayList<>();
+
         logsModels.forEach(p -> {
-            LogsModel ls = logsDAO.getFirstByDateAndTimeBeforeAndMessageIsContainingAndMessageIsContaining(p.getDate(), p.getTime(), p.getIp(true), "logged in");
+            List<LogsModel> lsl = logsDAO.getAllByTimeBeforeAndDateAndAndMessageIsContainingAndMessageIsContaining(p.getTime(),p.getDate(), p.getIp(true), "logged in");
+            LogsModel ls = null;
+            if(lsl.size()>0) {
+                ls = lsl.get(lsl.size() - 1);
+            }
             if (ls != null) {
                 ls.setLogsModel(p);
                 ls.setTelephone(httpclient.getTelNumberByName(ls.getUsername()));
@@ -50,6 +57,7 @@ public class LogsController {
             }
         });
         System.out.println(resultlog);
+
 
         return resultlog;
     }
